@@ -44,7 +44,7 @@ namespace pam_discord_login
             {
                 if (DateTime.Now.Subtract(whiteList.SingleOrDefault(x => x.Key == ipInfo.Ip).Value).Hours < 24)
                 {
-                    await webHook.SendMessageAsync("", "mvl.sh (SSH Login)", new []
+                    await webHook.SendMessageAsync("", $"{args[2]} (SSH Login)", new []
                     {
                         new Embed()
                         {
@@ -87,7 +87,7 @@ namespace pam_discord_login
                 }
             }
             
-            Message msg = await webHook.SendMessageAsync("", "mvl.sh (SSH Login)", new []
+            Message msg = await webHook.SendMessageAsync("", $"{args[2]} (SSH Login)", new []
             {
                 new Embed()
                 {
@@ -148,7 +148,7 @@ namespace pam_discord_login
                 {
                     if (reaction.name == "\U00002705")
                     {
-                        webHook.SendMessage("", "mvl.sh (SSH Login)", new[]
+                        webHook.SendMessage("", $"{args[2]} (SSH Login)", new[]
                         {
                             new Embed()
                             {
@@ -162,7 +162,7 @@ namespace pam_discord_login
                     }
                     else if (reaction.name == "\U0001F4BE")
                     {
-                        webHook.SendMessage("", "mvl.sh (SSH Login)", new[]
+                        webHook.SendMessage("", $"{args[2]} (SSH Login)", new[]
                         {
                             new Embed()
                             {
@@ -180,7 +180,7 @@ namespace pam_discord_login
                     }
                     else
                     {
-                        webHook.SendMessage("", "mvl.sh (SSH Login)", new[]
+                        webHook.SendMessage("", $"{args[2]} (SSH Login)", new[]
                         {
                             new Embed()
                             {
@@ -195,7 +195,7 @@ namespace pam_discord_login
                 }
                 else
                 {
-                    webHook.SendMessage("", "mvl.sh (SSH Login)", new[]
+                    webHook.SendMessage("", $"{args[2]} (SSH Login)", new[]
                     {
                         new Embed()
                         {
