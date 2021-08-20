@@ -102,8 +102,10 @@ namespace pam_discord_login
             
             using (var response = await client.SendAsync(request))
             {
-                response.EnsureSuccessStatusCode();
-                return JsonSerializer.Deserialize<IPInfo>(await response.Content.ReadAsStringAsync());
+                if (response.StatusCode == HttpStatusCode.OK)
+                    return JsonSerializer.Deserialize<IPInfo>(await response.Content.ReadAsStringAsync());
+                else
+                    return null;
             }
         }
     }

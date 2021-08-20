@@ -40,6 +40,17 @@ namespace pam_discord_login
             IPInfo ipInfo = await IPApi.GetInfo(IPAddress.Parse(args[1]));
             DiscordWebHook webHook = new DiscordWebHook($"https://discord.com/api/webhooks/{args[0]}");
 
+            if (ipInfo == null)
+            {
+                ipInfo = new IPInfo()
+                {
+                    Ip = "Unknown ip",
+                    City = "Unknown city",
+                    Region = "unknown region",
+                    CountryName = "unknown country"
+                };
+            }
+
             if (whiteList != null && whiteList.Any(x => x.Key == ipInfo.Ip))
             {
                 if (DateTime.Now.Subtract(whiteList.SingleOrDefault(x => x.Key == ipInfo.Ip).Value).Hours < 24)
@@ -66,7 +77,7 @@ namespace pam_discord_login
                                 new()
                                 {
                                     name = "Location",
-                                    value = $"{ipInfo.City}, {ipInfo.Region}, {ipInfo.CountryName}"
+                                    value = $"{ipInfo.City}, {ipInfo.Region}, {ipInfo.CountryName}."
                                 },
                                 new()
                                 {
@@ -109,7 +120,7 @@ namespace pam_discord_login
                         new()
                         {
                             name = "Location",
-                            value = $"{ipInfo.City}, {ipInfo.Region}, {ipInfo.CountryName}"
+                            value = $"{ipInfo.City}, {ipInfo.Region}, {ipInfo.CountryName}."
                         },
                         new()
                         {
@@ -207,6 +218,11 @@ namespace pam_discord_login
                     Console.WriteLine("[ TIME-OUT ]");
                     Environment.Exit(408);
                 }
+            }
+            else
+            {
+                Console.WriteLine("[ ERROR ]\nFATAL ISSUE!! Failed to send Discord message!!");
+                Environment.Exit(0);
             }
         }
     }
