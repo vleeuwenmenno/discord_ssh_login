@@ -7,9 +7,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using DiscordWebhookNET;
 using DiscordWebhookNET.Models;
-using DSharpPlus;
-using DSharpPlus.Entities;
-using DSharpPlus.SlashCommands;
 
 namespace pam_discord_login
 {
@@ -22,9 +19,9 @@ namespace pam_discord_login
 
         private async Task MainAsync(string[] args)
         {
-            if (args.Length == 0 && args.Length != 3)
+            if (args.Length == 0 && args.Length != 4)
             {
-                Console.WriteLine("Missing parameters, expected command [webhook] [remote_ip] [hostname]");
+                Console.WriteLine("Missing parameters, expected command [webhook] [remote_ip] [hostname] [open|close]");
                 return;
             }
 
@@ -51,143 +48,198 @@ namespace pam_discord_login
                 };
             }
 
-            if (whiteList != null && whiteList.Any(x => x.Key == ipInfo.Ip))
+            if (args[3] == "close")
             {
-                if (DateTime.Now.Subtract(whiteList.SingleOrDefault(x => x.Key == ipInfo.Ip).Value).Hours < 24)
+                await webHook.SendMessageAsync("", $"{args[2]} (SSH Login)", new []
                 {
-                    await webHook.SendMessageAsync("", $"{args[2]} (SSH Login)", new []
+                    new Embed()
                     {
-                        new Embed()
+                        color = 2123412,
+                        description = "A SSH connection is being closed.",
+                        title = "SSH Connection is closing",
+                        fields = new List<EmbedField>()
                         {
-                            color = 2067276,
-                            description = "Whitelisted IP has been auto-approved for login.",
-                            title = "SSH Login auto-approved",
-                            fields = new List<EmbedField>()
+                            new()
                             {
-                                new()
-                                {
-                                    name = "Remote IP",
-                                    value = $"`{ipInfo.Ip}`"
-                                },
-                                new()
-                                {
-                                    name = "Server hostname",
-                                    value = $"`{args[2]}`"
-                                },
-                                new()
-                                {
-                                    name = "Location",
-                                    value = $"{ipInfo.City}, {ipInfo.Region}, {ipInfo.CountryName}."
-                                },
-                                new()
-                                {
-                                    name = "Maps",
-                                    value = $"[Google Maps](https://maps.google.com/?q={ipInfo.Latitude},{ipInfo.Longitude})"
-                                }
+                                name = "Remote IP",
+                                value = $"`{ipInfo.Ip}`"
                             },
-                            timestamp = DateTime.Now
-                        }
-                    });
-                    Console.WriteLine("[ ACCEPTED ]");
-                    Environment.Exit(0);
-                }
-                else
-                {
-                    whiteList.Remove(ipInfo.Ip);
-                    await File.WriteAllTextAsync("/tmp/dpsdwl.json", JsonSerializer.Serialize(whiteList));
-                }
+                            new()
+                            {
+                                name = "Server hostname",
+                                value = $"`{args[2]}`"
+                            },
+                            new()
+                            {
+                                name = "Location",
+                                value = $"{ipInfo.City}, {ipInfo.Region}, {ipInfo.CountryName}."
+                            },
+                            new()
+                            {
+                                name = "Maps",
+                                value = $"[Google Maps](https://maps.google.com/?q={ipInfo.Latitude},{ipInfo.Longitude})"
+                            }
+                        },
+                        timestamp = DateTime.Now
+                    }
+                });
+                Console.WriteLine("[ CLOSED ]");
+                Environment.Exit(0);
             }
-            
-            Message msg = await webHook.SendMessageAsync("", $"{args[2]} (SSH Login)", new []
+            else if (args[3] == "open")
             {
-                new Embed()
+                if (whiteList != null && whiteList.Any(x => x.Key == ipInfo.Ip))
                 {
-                    color = 10038562,
-                    description = "Would you like to approve this login?",
-                    title = "SSH Login attempt",
-                    fields = new List<EmbedField>()
+                    if (DateTime.Now.Subtract(whiteList.SingleOrDefault(x => x.Key == ipInfo.Ip).Value).Hours < 24)
                     {
-                        new()
+                        await webHook.SendMessageAsync("", $"{args[2]} (SSH Login)", new []
                         {
-                            name = "Remote IP",
-                            value = $"`{ipInfo.Ip}`"
-                        },
-                        new()
-                        {
-                            name = "Server hostname",
-                            value = $"`{args[2]}`"
-                        },
-                        new()
-                        {
-                            name = "Location",
-                            value = $"{ipInfo.City}, {ipInfo.Region}, {ipInfo.CountryName}."
-                        },
-                        new()
-                        {
-                            name = "Maps",
-                            value = $"[Google Maps](https://maps.google.com/?q={ipInfo.Latitude},{ipInfo.Longitude})"
-                        },
-                        new()
-                        {
-                            name = "Options: ",
-                            value = $"\U00002705 = Approve | \U000026D4 = Decline | \U0001F4BE = Approve & Remember IP for today",
-                        }
-                    },
-                    timestamp = DateTime.Now
+                            new Embed()
+                            {
+                                color = 2067276,
+                                description = "Whitelisted IP has been auto-approved for login.",
+                                title = "SSH Login auto-approved",
+                                fields = new List<EmbedField>()
+                                {
+                                    new()
+                                    {
+                                        name = "Remote IP",
+                                        value = $"`{ipInfo.Ip}`"
+                                    },
+                                    new()
+                                    {
+                                        name = "Server hostname",
+                                        value = $"`{args[2]}`"
+                                    },
+                                    new()
+                                    {
+                                        name = "Location",
+                                        value = $"{ipInfo.City}, {ipInfo.Region}, {ipInfo.CountryName}."
+                                    },
+                                    new()
+                                    {
+                                        name = "Maps",
+                                        value = $"[Google Maps](https://maps.google.com/?q={ipInfo.Latitude},{ipInfo.Longitude})"
+                                    }
+                                },
+                                timestamp = DateTime.Now
+                            }
+                        });
+                        Console.WriteLine("[ ACCEPTED ]");
+                        Environment.Exit(0);
+                    }
+                    else
+                    {
+                        whiteList.Remove(ipInfo.Ip);
+                        await File.WriteAllTextAsync("/tmp/dpsdwl.json", JsonSerializer.Serialize(whiteList));
+                    }
                 }
-            });
-
-            if (msg != null)
-            {
-                Emoji reaction = await webHook.WaitForReaction(msg.id, 60 * 1000, new Emoji[]
+                
+                Message msg = await webHook.SendMessageAsync("", $"{args[2]} (SSH Login)", new []
                 {
-                    new()
+                    new Embed()
                     {
-                        name = "\U00002705"
-                    },
-                    new()
-                    {
-                        name = "\U000026D4"
-                    },
-                    new()
-                    {
-                        name = "\U0001F4BE"
+                        color = 10038562,
+                        description = "Would you like to approve this login?",
+                        title = "SSH Login attempt",
+                        fields = new List<EmbedField>()
+                        {
+                            new()
+                            {
+                                name = "Remote IP",
+                                value = $"`{ipInfo.Ip}`"
+                            },
+                            new()
+                            {
+                                name = "Server hostname",
+                                value = $"`{args[2]}`"
+                            },
+                            new()
+                            {
+                                name = "Location",
+                                value = $"{ipInfo.City}, {ipInfo.Region}, {ipInfo.CountryName}."
+                            },
+                            new()
+                            {
+                                name = "Maps",
+                                value = $"[Google Maps](https://maps.google.com/?q={ipInfo.Latitude},{ipInfo.Longitude})"
+                            },
+                            new()
+                            {
+                                name = "Options: ",
+                                value = $"\U00002705 = Approve | \U000026D4 = Decline | \U0001F4BE = Approve & Remember IP for today",
+                            }
+                        },
+                        timestamp = DateTime.Now
                     }
                 });
 
-                if (reaction != null)
+                if (msg != null)
                 {
-                    if (reaction.name == "\U00002705")
+                    Emoji reaction = await webHook.WaitForReaction(msg.id, 60 * 1000, new Emoji[]
                     {
-                        webHook.SendMessage("", $"{args[2]} (SSH Login)", new[]
+                        new()
                         {
-                            new Embed()
-                            {
-                                color = 2067276,
-                                description = $"Access has been approved for `{ipInfo.Ip}`",
-                                title = "SSH Login approved"
-                            }
-                        });
-                        Console.WriteLine("[ ACCEPTED ]");
-                        Environment.Exit(0);
-                    }
-                    else if (reaction.name == "\U0001F4BE")
+                            name = "\U00002705"
+                        },
+                        new()
+                        {
+                            name = "\U000026D4"
+                        },
+                        new()
+                        {
+                            name = "\U0001F4BE"
+                        }
+                    });
+
+                    if (reaction != null)
                     {
-                        webHook.SendMessage("", $"{args[2]} (SSH Login)", new[]
+                        if (reaction.name == "\U00002705")
                         {
-                            new Embed()
+                            webHook.SendMessage("", $"{args[2]} (SSH Login)", new[]
                             {
-                                color = 2067276,
-                                description = $"Access has been approved for `{ipInfo.Ip}` and IP has been whitelisted for the next 24 hours.",
-                                title = "SSH Login approved"
-                            }
-                        });
-                        Console.WriteLine("[ ACCEPTED ]");
-                        
-                        whiteList.Add(ipInfo.Ip, DateTime.Now);
-                        await File.WriteAllTextAsync("/tmp/dpsdwl.json", JsonSerializer.Serialize(whiteList));
-                        
-                        Environment.Exit(0);
+                                new Embed()
+                                {
+                                    color = 2067276,
+                                    description = $"Access has been approved for `{ipInfo.Ip}`",
+                                    title = "SSH Login approved"
+                                }
+                            });
+                            Console.WriteLine("[ ACCEPTED ]");
+                            Environment.Exit(0);
+                        }
+                        else if (reaction.name == "\U0001F4BE")
+                        {
+                            webHook.SendMessage("", $"{args[2]} (SSH Login)", new[]
+                            {
+                                new Embed()
+                                {
+                                    color = 2067276,
+                                    description = $"Access has been approved for `{ipInfo.Ip}` and IP has been whitelisted for the next 24 hours.",
+                                    title = "SSH Login approved"
+                                }
+                            });
+                            Console.WriteLine("[ ACCEPTED ]");
+                            
+                            whiteList.Add(ipInfo.Ip, DateTime.Now);
+                            await File.WriteAllTextAsync("/tmp/dpsdwl.json", JsonSerializer.Serialize(whiteList));
+                            
+                            Environment.Exit(0);
+                        }
+                        else
+                        {
+                            webHook.SendMessage("", $"{args[2]} (SSH Login)", new[]
+                            {
+                                new Embed()
+                                {
+                                    color = 10038562,
+                                    description = $"Access has been declined for `{ipInfo.Ip}`",
+                                    title = "SSH Login declined"
+                                }
+                            });
+                            Console.WriteLine("[ DECLINED ]");
+                            Environment.Exit(400);
+                        }
                     }
                     else
                     {
@@ -196,33 +248,19 @@ namespace pam_discord_login
                             new Embed()
                             {
                                 color = 10038562,
-                                description = $"Access has been declined for `{ipInfo.Ip}`",
-                                title = "SSH Login declined"
+                                description = "Login on SSH has timed-out after 60 seconds.",
+                                title = "SSH Login timed-out"
                             }
                         });
-                        Console.WriteLine("[ DECLINED ]");
-                        Environment.Exit(400);
+                        Console.WriteLine("[ TIME-OUT ]");
+                        Environment.Exit(408);
                     }
                 }
                 else
                 {
-                    webHook.SendMessage("", $"{args[2]} (SSH Login)", new[]
-                    {
-                        new Embed()
-                        {
-                            color = 10038562,
-                            description = "Login on SSH has timed-out after 60 seconds.",
-                            title = "SSH Login timed-out"
-                        }
-                    });
-                    Console.WriteLine("[ TIME-OUT ]");
-                    Environment.Exit(408);
+                    Console.WriteLine("[ ERROR ]\nFATAL ISSUE!! Failed to send Discord message!!");
+                    Environment.Exit(0);
                 }
-            }
-            else
-            {
-                Console.WriteLine("[ ERROR ]\nFATAL ISSUE!! Failed to send Discord message!!");
-                Environment.Exit(0);
             }
         }
     }
