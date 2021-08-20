@@ -1,3 +1,9 @@
+## What is this?
+
+In it's core it's basically a program that asks in a discord channel if you want to allow someone to login on SSH. Based on what reaction it receives it will approve, decline or approve & remember for 24 hours.
+
+Based on what result it got from the Discord (approve, decline, approve 24h or timeout) it will close the application with a specific error code, pam_exec.so can use this to allow or decline access. (It basically makes use of the `requisite` or `required` keyword)
+
 ### Pre-requisites
 
 - For compilation you need dotnet 5.0 or newer.
@@ -13,7 +19,7 @@ sudo nano /etc/pam.d/sshd
 2. Add the following to the bottom of the file but just above `@include common-password`
 ```
 # Request login permission from Discord webhook
-session    required     pam_exec.so   /usr/local/sbin/discord_sshd_login
+session    requisite     pam_exec.so   /usr/local/sbin/discord_sshd_login
 ```
 
 3. [A] Clone the repository and compile the executable:
@@ -37,6 +43,7 @@ sudo chmod +x /usr/local/sbin/discord_sshd_login
 
 6. Update the shell and replace the variable `WEBHOOK` with the end part of your webhook url from Discord.
 7. Open a new terminal and try logging into your server, see if everything works. Try it multiple times with decline, allow etc.
+
 
 ### WARNING & DISCLAIMER
 
