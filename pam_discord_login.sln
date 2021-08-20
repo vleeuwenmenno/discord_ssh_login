@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pam_discord_login", "pam_discord_login\pam_discord_login.csproj", "{BED32FAB-2E1E-41F2-B371-914435558E10}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordWebhookNET", "DiscordWebhookNET\DiscordWebhookNET.csproj", "{9A928D98-2E25-419C-9EFB-0C1AF864BEE1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BED32FAB-2E1E-41F2-B371-914435558E10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BED32FAB-2E1E-41F2-B371-914435558E10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BED32FAB-2E1E-41F2-B371-914435558E10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BED32FAB-2E1E-41F2-B371-914435558E10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A928D98-2E25-419C-9EFB-0C1AF864BEE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A928D98-2E25-419C-9EFB-0C1AF864BEE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A928D98-2E25-419C-9EFB-0C1AF864BEE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A928D98-2E25-419C-9EFB-0C1AF864BEE1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
