@@ -184,11 +184,11 @@ namespace pam_discord_login
                         },
                         new()
                         {
-                            name = "\U00002611"
+                            name = "☑️"
                         },
                         new()
                         {
-                            name = "\U00002714"
+                            name = "✔️"
                         },
                         new()
                         {
@@ -202,7 +202,7 @@ namespace pam_discord_login
 
                     if (reaction != null)
                     {
-                        if (reaction.name is "\U00002705" or "\U00002611" or "\U00002714")
+                        if (reaction.name is "\U00002705" or "☑️" or "✔️")
                         {
                             webHook.SendMessage("", $"{args[2]} (SSH Login)", new[]
                             {
